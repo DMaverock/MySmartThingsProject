@@ -29,8 +29,8 @@ preferences {
     page(name: "mainPage", title: "Existing Insteon Device", install: true, uninstall: true) {
         if(state?.installed) {
             section("Add a New Insteon Device") {
-                app "Insteon Dimmer Child", "DMaverock", "Insteon Dimmer Child", title: "New Insteon Dimmer Switch, Dimmer Plug, or Bulb", page: "mainPage", multiple: true, install: true
-                app "Insteon On/Off Child", "DMaverock", "Insteon On/Off Child", title: "New Insteon On/Off Switch or On/Off Plug", page: "mainPage", multiple: true, install: true
+                app(name: "InsteonDimmer", appName: "Insteon Dimmer Child", namespace: "DMaverock", title: "New Insteon Dimmer Switch, Dimmer Plug, or Bulb", page: "mainPage", multiple: true, install: true)
+                app(name: "InsteonOn/Off", appName: "Insteon On/Off Child", namespace: "DMaverock", title: "New Insteon On/Off Switch or On/Off Plug", page: "mainPage", multiple: true, install: true)
             }
         } else {
             section("Initial Install") {
@@ -43,16 +43,34 @@ preferences {
 def installed() {
     log.debug "Installed with settings: ${settings}"
 
-    initialize()
+    //initialize()
 }
 
 def updated() {
     log.debug "Updated with settings: ${settings}"
 
     unsubscribe()
-    initialize()
+    //initialize()
 }
 
-def initialize() {
+def initialize() {	
+	log.debug "parent initialize"
     state.installed = true
+/*    
+    log.debug "there are ${childApps.size()} child smartapps"
+    childApps.each {child ->
+        log.debug "child app: ${child.label}"
+      
+    }
+*/    
+}
+
+def childUninstalled() {
+	log.debug "Child Uninstalled"
+}
+
+def doRefresh() {
+
+	log.debug "parent doRefresh"
+
 }
