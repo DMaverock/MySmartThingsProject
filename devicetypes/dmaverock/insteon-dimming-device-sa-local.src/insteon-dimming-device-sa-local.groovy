@@ -192,6 +192,8 @@ def refresh() {
     //    def content = response.data
     //    log.debug content
     //} 
+    log.debug "sendRefresh"
+    sendRefresh()
     log.debug "getStatus"
     try {
 	getStatus(1)
@@ -264,7 +266,7 @@ def getStatus(num) {
 			
             else
             {
-                //sendCmd("19", "00")
+                sendRefresh()
                 num = num + 1
                 getStatus(num)
                 log.debug "DeviceID is different"
@@ -272,7 +274,7 @@ def getStatus(num) {
         }        
         else
         {
-            //sendCmd("19", "00")        
+            sendRefresh()
             num = num + 1
             getStatus(num)
             log.debug "Unexpected Buffer Length (should be 100)"
@@ -310,7 +312,7 @@ def sendRefresh() {
     catch (Exception e) {
     log.debug "Hit Exception on $hubAction"
     log.debug e
-    }
+    }    
 }
 
 def buffStatus() {
