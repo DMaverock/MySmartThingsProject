@@ -34,12 +34,12 @@ preferences {
         	input("hubName", "hub", title:"Hub", description: "Please select your Hub", required: true, multiple: false, displayDuringSetup: true, defaultValue: null)
         }
         section("Add an Insteon Dimmer Device") {
-			input("InsteonID","string", title: "Insteon Device ID", description: "Please enter your Insteon Device's ID", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "22653A")           
-        	input("InsteonIP","string", title: "Insteon Hub IP", description: "Please enter your Insteon Hub's IP Address", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "192.168.0.200")           
-            input("ExternalIP","string", title: "Insteon Hub External IP", description: "Please enter your Insteon Hub's External IP Address", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "dhsiung.dlinkddns.com")                                      
+			input("InsteonID","string", title: "Insteon Device ID", description: "Please enter your Insteon Device's ID", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "")           
+        	input("InsteonIP","string", title: "Insteon Hub IP", description: "Please enter your Insteon Hub's IP Address", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "")           
+            input("ExternalIP","string", title: "Insteon Hub External IP", description: "Please enter your Insteon Hub's External IP Address", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "")                                      
         	input("port","string", title: "Insteon Hub Port", description: "Please enter your Insteon Hub's Port Number", required:true, submitOnChange: true, defaultValue: "25105", displayDuringSetup: true)           
-        	input("InsteonHubUsername","string", title: "Insteon Hub Username", description: "Please enter your Insteon Hub's Username", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "dhsiung")           
-        	input("InsteonHubPassword","password", title: "Insteon Hub Password", description: "Please enter your Insteon Hub's Password", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "Carmen1231")                                      
+        	input("InsteonHubUsername","string", title: "Insteon Hub Username", description: "Please enter your Insteon Hub's Username", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "")           
+        	input("InsteonHubPassword","password", title: "Insteon Hub Password", description: "Please enter your Insteon Hub's Password", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "")                                      
         }        
     }
     
