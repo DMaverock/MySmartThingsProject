@@ -17,7 +17,7 @@ definition(
     name: "Insteon Dimmer Child",
     namespace: "DMaverock",
     author: "DMaverock",
-    description: "Child Insteon Dimmer SmartApp",
+    description: "Child Insteon Dimmer SmartApp with External Server",
     category: "My Apps",
     parent: "DMaverock:Insteon Connect",
     iconUrl: "http://cdn.device-icons.smartthings.com/Lighting/light11-icn.png",
@@ -48,14 +48,14 @@ preferences {
 def installed() {
     log.debug "Installed"	
     initialize()    
-    log.debug "Values are: $InsteonID -- $InsteonIP -- $port -- $InsteonHubUsername -- $InsteonHubPassword -- $hubName -- " + app.label
+    log.debug "Values are: $InsteonID -- $InsteonIP -- $port -- $InsteonHubUsername -- $InsteonHubPassword -- $hubName -- "
 }
 
 def updated() {
     log.debug "Updated"
     unsubscribe()
     initialize()    
-    log.debug "Values are: $InsteonID -- $InsteonIP -- $port -- $InsteonHubUsername -- $InsteonHubPassword -- $hubName -- " + app.label
+    log.debug "Values are: $InsteonID -- $InsteonIP -- $port -- $InsteonHubUsername -- $InsteonHubPassword -- $hubName -- "
 }
 
 def initialize() {    
@@ -67,7 +67,7 @@ def initialize() {
     state.InsteonHubUsername = InsteonHubUsername
     state.InsteonHubPassword = InsteonHubPassword    
     //state.hubName = hubName    
-    log.debug "hub ID is " + hubName.id    
+    log.debug "hub ID is " + hubName.id
  
     try {
         def DNIRaw = (Math.abs(new Random().nextInt()) % 99999 + 1)//.toString()
@@ -81,7 +81,7 @@ def initialize() {
             log.debug "DNI is ${insteon.deviceNetworkId}"
             insteon[0].name = app.label
             insteon[0].label = app.label
-            //insteon.displayName = app.label
+            insteon[0].displayName = app.label
             insteon[0].configure()
         }
         else {
