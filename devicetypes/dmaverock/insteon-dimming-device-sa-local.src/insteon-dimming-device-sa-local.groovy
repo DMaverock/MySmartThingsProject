@@ -16,6 +16,8 @@
  *
  */
  
+import groovy.json.JsonSlurper
+ 
 metadata {
 	definition (name: "Insteon Dimming Device SA (LOCAL)", namespace: "DMaverock", author: "patrick@patrickstuart.com/tslagle13@gmail.com/goldmichael@gmail.com/maverickd@live.com") {
 		capability "Switch"
@@ -23,7 +25,7 @@ metadata {
 		capability "Actuator"
         capability "Switch Level"
         capability "Polling"
-        capability "Refresh"
+        capability "Refresh"                
 	}
 /*
     preferences {
@@ -49,7 +51,7 @@ metadata {
 		multiAttributeTile(name: "switch", type: "lighting", width: 6, height: 4, canChangeIcon: true, canChangeBackground: true) {
 			tileAttribute("device.switch", key: "PRIMARY_CONTROL") {
         			attributeState "off", label: "off", action: "switch.on", icon: "st.switches.light.off", backgroundColor: "#ffffff", nextState: "turningOn"
-			      	attributeState "on", label: "on", action: "switch.off", icon: "st.switches.light.on", backgroundColor: "#79b821", nextState: "turningOff"
+			      	attributeState "on", label: "on", action: "switch.off", icon: "st.switches.light.on", backgroundColor: "#00a0dc", nextState: "turningOff"
                   	attributeState "turningOff", label: "turningOff", action: "switch.on", icon: "st.switches.light.off", backgroundColor: "#ffffff", nextState: "turningOn"
 			      	attributeState "turningOn", label: "turningOn", action: "switch.off", icon: "st.switches.light.on", backgroundColor: "#79b821", nextState: "turningOff"
             		}
@@ -61,7 +63,7 @@ metadata {
             		}    
 		}
 		standardTile("refresh", "device.switch", inactiveLabel: false, decoration: "flat", width: 6, height: 2) {
-			state "default", label:"", action:"refresh.refresh", icon:"st.secondary.refresh"
+			state "default", label:"", action:"refresh.refresh", icon:"st.secondary.refresh"            
 		}
       
 		main "switch"
@@ -100,6 +102,7 @@ def on() {
     log.debug "Hit Exception on $hubAction"
     log.debug e
     }    	
+    
 }
 
 def off() {
@@ -169,64 +172,74 @@ def setLevel(level) {
 }
 
 def refresh() {
-	
-    log.debug "Start Refresh"
-	def InsteonHubUsername = parent.InsteonHubUsername
+	log.debug "Initiating Refresh"
+    sendRefresh()    
+    log.debug "Getting in 3 seconds"
+    runIn(3,startRefresh)
+}
+
+def sendRefresh() {
+
+	log.debug "Send Refresh Status"            
+    def InsteonHubUsername = parent.InsteonHubUsername
     def InsteonHubPassword = parent.InsteonHubPassword
     def InsteonID = parent.InsteonID
     def host = parent.InsteonIP
     def port = parent.port
-    def hosthex = convertIPToHex(host)
-    def porthex = Long.toHexString(Long.parseLong((port)))
-    if (porthex.length() < 4) { porthex = "00" + porthex }
+    def externalIP = parent.ExternalIP
+    
+    def path = "/3?0262" + parent.InsteonID  + "0F1900=I=3"
+    log.debug "RefreshPath is: $path"
+    
+    httpGet("http://$externalIP:91/InsteonHub.php?url=http://$InsteonHubUsername:$InsteonHubPassword@$host:$port" + "$path")    
 
-    def currDNI = device.deviceNetworkId
-    log.debug "currDNI is $currDNI"
-    log.debug "InsteonID is $InsteonID, host is $host, port is $port"
-    //log.debug "doRefresh Start"
-    //def del = getChildDevices().findAll { settings.devices.contains(currDNI) }
-    //parent.doRefresh()
-    //log.debug "doRefresh End"
+}
+
+def startRefresh() {
+
+    log.debug "Start Refresh"        
+    def InsteonHubUsername = parent.InsteonHubUsername
+    def InsteonHubPassword = parent.InsteonHubPassword
+    def InsteonID = parent.InsteonID
+    def host = parent.InsteonIP
+    def port = parent.port
+    def externalIP = parent.ExternalIP
+    log.debug "InsteonID: " + InsteonID    
+
+    def params = [
+        uri: "http://$externalIP:91/InsteonHub.php?url=http://$InsteonHubUsername:$InsteonHubPassword@$host:$port/buffstatus.xml&InstID=$InsteonID"
+    ]
     
-    //httpGet("http://${InsteonHubUsername}:${InsteonHubPassword}@" + "${host}" + ":" + "${port}" + "//3?0262${InsteonID}0F1900=I=3") {response ->     
-    //    def content = response.data
-    //    log.debug content
-    //} 
-    log.debug "sendRefresh"
-    sendRefresh()
-    log.debug "getStatus"
-    try {
-	getStatus(1)
-   	}
-    catch (Exception e) {
-    	log.debug "Error with getStatus"
-    }
-    log.debug "getStatus done"
+    //log.debug "http://dhsiung.dlinkddns.com:91/InsteonHubStatus.php?url=http://$InsteonHubUsername:$InsteonHubPassword@$host:$port/sx.xml?$InsteonID=1900"
+
+	try {
+        httpPost(params) { resp ->
+            def jsonSlurper = new JsonSlurper()
+            def object = jsonSlurper.parseText("${resp.data}")
+
+            log.debug "Percent: ${object.percent}"
+            log.debug "Status: ${object.status}"
+            log.debug "DeviceID: ${object.deviceid}"
+            
+            if (object.deviceid == InsteonID) {
+            
+                if (object.percent > 0) {
+                    sendEvent(name: "switch", value: "on")
+                    sendEvent(name: "level", value: object.percent, unit: "%")
+                } else {
+                    sendEvent(name: "switch", value: "off")
+                    sendEvent(name: "level", value: object.percent, unit: "%")
+                }
+            }
+            else {
+            	log.debug "DeviceID doesn't match"
+            }
+        }
+    } catch (e) {
+        log.error "something went wrong: $e"
+    }    
     
-/*
-    log.debug "Command Sent: " + "19" + ", " + "00"
-   
-    def i = Math.round(convertHexToInt(level) / 256 * 100 )
-	sendEvent( name: "level", value: i )
-*/
-    //log.debug "Port in Hex is $porthex"
-    //log.debug "Hosthex is : $hosthex"    
-    //def deviceNetworkId = "$hosthex:$porthex" 
-    //def instID = "$InsteonID"
-    //instID = instID.toLowerCase()
-    //log.debug "ID is $instID"
-    //def deviceNetworkId = "$instID:$porthex" 
-    //log.debug "newDNI is $deviceNetworkId"
-    //device.deviceNetworkId = "$deviceNetworkId"
-    
-    //sendRefresh()    
-    //def result = buffStatus()        
-    //return result
-    
-    //device.deviceNetworkId = currDNI
-    //log.debug "After DNI is " + device.deviceNetworkId    
-    log.debug "End refresh"
-	      
+    //log.debug content
 }
 
 def getStatus(num) {
@@ -239,11 +252,12 @@ def getStatus(num) {
 
 	if(num < 6)
     {    	
+    	sendRefresh()
 		httpGet("http://${InsteonHubUsername}:${InsteonHubPassword}@" + "${host}" + ":" + "${port}" + "/buffstatus.xml") {response ->             
         def content = response.data
-        log.debug content
-            	
-        if(content.text().length() == 100)
+        log.debug content.text()
+                
+        if(content.text().length() == 202)
         {
             log.debug content.text().substring(22,28)
             if(content.text().substring(22,28) == InsteonID)
@@ -267,6 +281,7 @@ def getStatus(num) {
             else
             {
                 sendRefresh()
+                reqStatus()
                 num = num + 1
                 getStatus(num)
                 log.debug "DeviceID is different"
@@ -277,16 +292,16 @@ def getStatus(num) {
             sendRefresh()
             num = num + 1
             getStatus(num)
-            log.debug "Unexpected Buffer Length (should be 100)"
+            log.debug "Unexpected Buffer Length (should be 202)"
         }        
       }
    }
    else { log.debug "Timeout, too many retries (5)" }        
 }
 
-def sendRefresh() {
+def reqStatus() {
 
-	log.debug "Refreshing Status"    
+	log.debug "Requesting Status"    
     def host = parent.InsteonIP
     def port = parent.port
     
@@ -312,7 +327,8 @@ def sendRefresh() {
     catch (Exception e) {
     log.debug "Hit Exception on $hubAction"
     log.debug e
-    }    
+    }        
+    
 }
 
 def buffStatus() {
@@ -333,12 +349,13 @@ def buffStatus() {
     def userpassascii = parent.InsteonHubUsername + ":" + parent.InsteonHubPassword
 	def userpass = "Basic " + userpassascii.encodeAsBase64().toString()
     def headers = [:] //"HOST:" 
-    headers.put("HOST", "$host:$port")
+    headers.put("HOST", "$hosthex:$porthex")
     headers.put("Authorization", userpass)
 
-    def method = "GET"
+    def method = "POST"
     
-    log.debug "hubAction buffStatus"
+    log.debug "hubAction buffStatus"   
+    
     try {
     def hubAction = new physicalgraph.device.HubAction(
     	method: method,
@@ -351,10 +368,41 @@ def buffStatus() {
     log.debug "Hit Exception on $hubAction"
     log.debug e
     }    
+   
 }
 
 def poll() {
-	getStatus(1)
+	refresh()
+    //buffStatus()
+	//getStatus(1)
+}
+
+void deviceDescriptionHandler(physicalgraph.device.HubResponse hubResponse) {
+	log.debug "deviceDescriptionHandler"
+    def body = hubResponse.xml
+    def devices = getDevices()
+    def device = devices.find { it?.key?.contains(body?.device?.UDN?.text()) }
+    if (device) {
+        device.value << [name: body?.device?.roomName?.text(), model: body?.device?.modelName?.text(), serialNumber: body?.device?.serialNum?.text(), verified: true]
+    }
+}
+
+def cmdResponse(response){
+	//cmdResponse = response.headers["cmd-response"]    
+	
+    def msg = parseLanMessage(cmdResponse)
+
+    def headersAsString = msg.header // => headers as a string
+    def headerMap = msg.headers      // => headers as a Map
+    def body = msg.body              // => request body as a string
+    def status = msg.status          // => http status code of the response
+    def json = msg.json              // => any JSON included in response body, as a data structure of lists and maps
+    def xml = msg.xml                // => any XML included in response body, as a document tree structure
+    def data = msg.data              // => either JSON or XML in response body (whichever is specified by content-type header in response)
+    
+    log.debug "cmdResponse Parsing"
+    
+    log.debug "status: $status -- body: $body -- json: $json -- xml: $xml -- data: $data"
 }
 
 def parse(description) {
@@ -444,5 +492,5 @@ def configure() {
 	log.debug "Executing 'configure'"
     //state.hubName = parent.hubName
     //sendEvent(name:"switch", value: "on")
-    refresh()
+    //refresh()
 }

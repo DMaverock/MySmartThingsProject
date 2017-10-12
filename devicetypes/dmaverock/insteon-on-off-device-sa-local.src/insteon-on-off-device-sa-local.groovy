@@ -48,7 +48,7 @@ metadata {
 		multiAttributeTile(name: "switch", type: "lighting", width: 6, height: 4, canChangeIcon: true, canChangeBackground: true) {
 			tileAttribute("device.switch", key: "PRIMARY_CONTROL") {
         			attributeState "off", label: "off", action: "switch.on", icon: "st.switches.light.off", backgroundColor: "#ffffff", nextState: "turningOn"
-			      	attributeState "on", label: "on", action: "switch.off", icon: "st.switches.light.on", backgroundColor: "#79b821", nextState: "turningOff"
+			      	attributeState "on", label: "on", action: "switch.off", icon: "st.switches.light.on", backgroundColor: "#00a0dc", nextState: "turningOff"
                   	attributeState "turningOff", label: "turningOff", action: "switch.on", icon: "st.switches.light.off", backgroundColor: "#ffffff", nextState: "turningOn"
 			      	attributeState "turningOn", label: "turningOn", action: "switch.off", icon: "st.switches.light.on", backgroundColor: "#79b821", nextState: "turningOff"
             		}
@@ -180,8 +180,8 @@ def refresh() {
     if (porthex.length() < 4) { porthex = "00" + porthex }
 
     def currDNI = device.deviceNetworkId
-    log.debug "currDNI is $currDNI"
-    log.debug "InsteonID is $InsteonID, host is $host, port is $port"
+    //log.debug "currDNI is $currDNI"
+    //log.debug "InsteonID is $InsteonID, host is $host, port is $port"
     //log.debug "doRefresh Start"
     //def del = getChildDevices().findAll { settings.devices.contains(currDNI) }
     //parent.doRefresh()
@@ -191,9 +191,11 @@ def refresh() {
     //    def content = response.data
     //    log.debug content
     //} 
+    
     log.debug "sendRefresh"
     sendRefresh()
-    log.debug "getStatus"
+    
+    log.debug "getStatus"    
     try {
 	getStatus(1)
    	}
@@ -242,7 +244,7 @@ def getStatus(num) {
         def content = response.data
         log.debug content
             	
-        if(content.text().length() == 100)
+        if(content.text().length() == 202)
         {
             log.debug content.text().substring(22,28)
             if(content.text().substring(22,28) == InsteonID)
@@ -265,9 +267,9 @@ def getStatus(num) {
 			
             else
             {
-                sendRefresh()
+                //sendRefresh()
                 num = num + 1
-                getStatus(num)
+                //getStatus(num)
                 log.debug "DeviceID is different"
             }
         }        
@@ -276,7 +278,7 @@ def getStatus(num) {
             sendRefresh()     
             num = num + 1
             getStatus(num)
-            log.debug "Unexpected Buffer Length (should be 100)"
+            log.debug "Unexpected Buffer Length (should be 202)"
         }        
       }
    }
@@ -353,6 +355,7 @@ def buffStatus() {
 }
 
 def poll() {
+	sendRefresh()
 	getStatus(1)
 }
 
