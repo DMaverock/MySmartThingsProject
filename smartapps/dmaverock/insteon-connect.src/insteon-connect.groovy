@@ -14,7 +14,7 @@
 *
 */
 definition(
-    name: "Insteon Connect",
+    name: "Insteon (Connect)",
     namespace: "DMaverock",
     author: "DMaverock",
     description: "This smartapp installs the Insteon Connect App so you can add multiple Insteon Devices",
@@ -29,9 +29,9 @@ preferences {
     page(name: "mainPage", title: "Existing Insteon Device", install: true, uninstall: true) {
         if(state?.installed) {
             section("Add a New Insteon Device") {
-                app(name: "InsteonDimmerExt", appName: "Insteon Dimmer Child ExtServer", namespace: "DMaverock", title: "New Insteon Dimmer Switch/Plug or Bulb (With External Server)", page: "mainPage", multiple: true, install: true)
-                app(name: "InsteonDimmer", appName: "Insteon Dimmer Child", namespace: "DMaverock", title: "New Insteon Dimmer Switch/Plug or Bulb (Without External Server", page: "mainPage", multiple: true, install: true)
-                app(name: "InsteonOn/Off", appName: "Insteon On/Off Child", namespace: "DMaverock", title: "New Insteon On/Off Switch/Plug", page: "mainPage", multiple: true, install: true)
+                app(name: "InsteonDimmerExt", appName: "Insteon Dimmer Child ExtServer", namespace: "DMaverock", title: "New Insteon Dimmer Switch, Plug, or Bulb (External Server)", page: "mainPage", multiple: true, install: true)
+                app(name: "InsteonDimmer", appName: "Insteon Dimmer Child", namespace: "DMaverock", title: "New Insteon Dimmer Switch, Plug, or Bulb (No External Server)", page: "mainPage", multiple: true, install: true)
+                app(name: "InsteonOn/Off", appName: "Insteon On/Off Child", namespace: "DMaverock", title: "New Insteon On/Off Switch or Plug", page: "mainPage", multiple: true, install: true)
             }
         } else {
             section("Initial Install") {

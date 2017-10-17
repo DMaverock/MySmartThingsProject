@@ -19,7 +19,7 @@ definition(
     author: "DMaverock",
     description: "Child Insteon Dimmer SmartApp with External Server",
     category: "My Apps",
-    parent: "DMaverock:Insteon Connect",
+    parent: "DMaverock:Insteon (Connect)",
     iconUrl: "http://cdn.device-icons.smartthings.com/Lighting/light11-icn.png",
     iconX2Url: "http://cdn.device-icons.smartthings.com/Lighting/light11-icn@2x.png",
     iconX3Url: "http://cdn.device-icons.smartthings.com/Lighting/light11-icn@2x.png")

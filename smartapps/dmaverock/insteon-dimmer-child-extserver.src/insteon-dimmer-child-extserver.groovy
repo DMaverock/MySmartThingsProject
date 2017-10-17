@@ -19,7 +19,7 @@ definition(
     author: "DMaverock",
     description: "Child Insteon Dimmer SmartApp with External Server",
     category: "My Apps",
-    parent: "DMaverock:Insteon Connect",
+    parent: "DMaverock:Insteon (Connect)",
     iconUrl: "http://cdn.device-icons.smartthings.com/Lighting/light11-icn.png",
     iconX2Url: "http://cdn.device-icons.smartthings.com/Lighting/light11-icn@2x.png",
     iconX3Url: "http://cdn.device-icons.smartthings.com/Lighting/light11-icn@2x.png")
@@ -31,15 +31,16 @@ preferences {
             label(name: "label", title: "Name This Insteon Dimmer Device", required: true, multiple: false, submitOnChange: true)
         }          
         section("Hub Settings") {
-        	input("hubName", "hub", title:"Hub", description: "Please select your Hub", required: true, multiple: false, displayDuringSetup: true, defaultValue: null)
+        	input("hubName", "hub", title:"Hub", description: "Please select your Hub", required: true, multiple: false, displayDuringSetup: true)
         }
         section("Add an Insteon Dimmer Device") {
-			input("InsteonID","string", title: "Insteon Device ID", description: "Please enter your Insteon Device's ID", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "")           
-        	input("InsteonIP","string", title: "Insteon Hub IP", description: "Please enter your Insteon Hub's IP Address", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "")           
-            input("ExternalIP","string", title: "Insteon Hub External IP", description: "Please enter your Insteon Hub's External IP Address", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "")                                      
+			input("InsteonID","string", title: "Insteon Device ID", description: "Please enter your Insteon Device's ID", required:true, submitOnChange: true, displayDuringSetup: true)           
+        	input("InsteonIP","string", title: "Insteon Hub IP", description: "Please enter your Insteon Hub's IP Address", required:true, submitOnChange: true, displayDuringSetup: true)           
+            input("ExternalIP","string", title: "Insteon Hub External IP", description: "Please enter your Insteon Hub's External IP Address", required:true, submitOnChange: true, displayDuringSetup: true)                                      
+            input("ExternalStatusServerIP","string", title: "Polling Server IP", description: "Please enter the IP Address of your Polling Server", required:true, submitOnChange: true, displayDuringSetup: true)                                      
         	input("port","string", title: "Insteon Hub Port", description: "Please enter your Insteon Hub's Port Number", required:true, submitOnChange: true, defaultValue: "25105", displayDuringSetup: true)           
-        	input("InsteonHubUsername","string", title: "Insteon Hub Username", description: "Please enter your Insteon Hub's Username", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "")           
-        	input("InsteonHubPassword","password", title: "Insteon Hub Password", description: "Please enter your Insteon Hub's Password", required:true, submitOnChange: true, displayDuringSetup: true, defaultValue: "")                                      
+        	input("InsteonHubUsername","string", title: "Insteon Hub Username", description: "Please enter your Insteon Hub's Username", required:true, submitOnChange: true, displayDuringSetup: true)           
+        	input("InsteonHubPassword","password", title: "Insteon Hub Password", description: "Please enter your Insteon Hub's Password", required:true, submitOnChange: true, displayDuringSetup: true)                                      
         }        
     }
     
